@@ -1,0 +1,28 @@
+services:
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./data:/app/data
+      - ./model:/app/model
+    environment:
+      DATABASE_URL: postgresql://ocean:password@postgis:5432/ocean_db
+    depends_on:
+      - postgis
+
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_USER: ocean
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ocean_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
