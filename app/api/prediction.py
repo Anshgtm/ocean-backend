@@ -15,6 +15,12 @@ class PredictionRequest(BaseModel):
     lat: float = Field(..., ge=5, le=30)
     lon: float = Field(..., ge=45, le=105)
 
+    sst: float
+    sss: float
+    ssh: float
+    current_u: float
+    current_v: float
+
 
 @router.post("/predict")
 def predict(
@@ -22,18 +28,16 @@ def predict(
     db: Session = Depends(get_db)
 ):
 
-    result = generate_prediction(
-        db,
-        request.date,
-        request.lat,
-        request.lon
-    )
+    ocean_data = {
+    "sst": request.sst,
+    "sss": request.sss,
+    "ssh": request.ssh,
+    "current_u": request.current_u,
+    "current_v": request.current_v
+}
 
-    if result is None:
-        raise HTTPException(
-            status_code=404,
-            detail="No ocean data found for this location and date"
-        )
+    result = generate_prediction(ocean_data)
+
 
     depths, temperature = result
 
